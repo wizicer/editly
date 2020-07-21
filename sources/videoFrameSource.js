@@ -6,7 +6,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
 
   // TODO assert that we have read the correct amount of frames
 
-  const { path, cutFrom, cutTo, resizeMode = 'cover', backgroundColor = '#000000', framePtsFactor } = params;
+  const { path, cutFrom, cutTo, resizeMode = 'cover', backgroundColor = '#000000', framePtsFactor, scaleFactor = 1 } = params;
 
   const buf = Buffer.allocUnsafe(targetSize);
   let length = 0;
@@ -21,7 +21,8 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   let scaleFilter;
   if (resizeMode === 'stretch') scaleFilter = `scale=${width}:${height}`;
   // https://superuser.com/questions/891145/ffmpeg-upscale-and-letterbox-a-video/891478
-  else if (resizeMode === 'contain') scaleFilter = `scale=(iw*sar)*min(${width}/(iw*sar)\\,${height}/ih):ih*min(${width}/(iw*sar)\\,${height}/ih), pad=${width}:${height}:(${width}-iw*min(${width}/iw\\,${height}/ih))/2:(${height}-ih*min(${width}/iw\\,${height}/ih))/2:${backgroundColor}`;
+  else if (resizeMode === 'contain') scaleFilter = `scale=(iw*sar)*min(${width}/(iw*sar)\\,${height}/ih):ih*min(${width}/(iw*sar)\\,${height}/ih),`
+          + ` pad=${width}:${height}:(${width}-iw*min(${width}/iw\\,${height}/ih))/2:(${height}-ih*min(${width}/iw\\,${height}/ih))/2:${backgroundColor}`;
   // Cover: https://unix.stackexchange.com/a/192123
   else scaleFilter = `scale=(iw*sar)*max(${width}/(iw*sar)\\,${height}/ih):ih*max(${width}/(iw*sar)\\,${height}/ih),crop=${width}:${height}`;
 
