@@ -78,18 +78,18 @@ async function imageFrameSource({ verbose, params, width, height }) {
 
 
   async function onRender(progress, canvas) {
-    const { zoomDirection = 'in', zoomAmount = 0.1 } = params;
+    const { zoomDirection = 'in', zoomAmount = 0.1, scaleFactor = 0.5, blurBackground = false } = params;
 
     const img = getImg();
 
-    let scaleFactor = 1;
-    if (zoomDirection === 'in') scaleFactor = (1 + progress * zoomAmount);
-    else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+    let effectScaleFactor = scaleFactor;
+    if (zoomDirection === 'in') effectScaleFactor = (1 + progress * zoomAmount);
+    else if (zoomDirection === 'out') effectScaleFactor = (1 + zoomAmount * (1 - progress));
 
-    if (img.height > img.width) img.scaleToHeight(height * scaleFactor);
-    else img.scaleToWidth(width * scaleFactor);
+    if (img.height > img.width) img.scaleToHeight(height * effectScaleFactor);
+    else img.scaleToWidth(width * effectScaleFactor);
 
-    canvas.add(blurredImg);
+    if (blurBackground) canvas.add(blurredImg);
     canvas.add(img);
   }
 
@@ -196,7 +196,7 @@ async function subtitleFrameSource({ width, height, params }) {
   const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = 'sans-serif', delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
-    const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
+    // const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
 
     const min = Math.min(width, height);
     const padding = 0.05 * min;
@@ -210,9 +210,11 @@ async function subtitleFrameSource({ width, height, params }) {
       width: width - padding * 2,
       originX: 'center',
       originY: 'bottom',
-      left: (width / 2) + (-1 + easedProgress) * padding,
+      // left: (width / 2) + (-1 + easedProgress) * padding,
+      left: (width/2),
       top: height - padding,
-      opacity: easedProgress,
+      opacity: 1
+      // opacity: easedProgress,
     });
 
     const rect = new fabric.Rect({
@@ -222,7 +224,8 @@ async function subtitleFrameSource({ width, height, params }) {
       top: height,
       originY: 'bottom',
       fill: backgroundColor,
-      opacity: easedProgress,
+      // opacity: easedProgress,
+      opacity: 1
     });
 
     canvas.add(rect);
