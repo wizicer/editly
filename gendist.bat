@@ -6,3 +6,4 @@ rd dist\node_modules\gl /s /q
 
 call nexe cli.js
 move cli.exe dist\generate.exe
+copy package.json dist\
